@@ -88,6 +88,13 @@ func (t *Target) ensureFrame() (*cdp.Frame, *cdp.Node, runtime.ExecutionContextI
 	return frame, root, execCtx, true
 }
 
+// Returns the current active frame
+func (t *Target) GetCurrentFrame() *cdp.Frame {
+	t.frameMu.RLock()
+	defer t.frameMu.RUnlock()
+	return t.frames[t.cur]
+}
+
 func (t *Target) run(ctx context.Context) {
 	type eventValue struct {
 		method cdproto.MethodType
@@ -257,9 +264,7 @@ func (t *Target) runtimeEvent(ev interface{}) {
 // documentUpdated handles the document updated event, retrieving the document
 // root for the root frame.
 func (t *Target) documentUpdated(ctx context.Context) {
-	t.frameMu.RLock()
-	f := t.frames[t.cur]
-	t.frameMu.RUnlock()
+	f := t.GetCurrentFrame()
 	if f == nil {
 		// TODO: This seems to happen on CI, when running the tests
 		// under the headless-shell Docker image. Figure out why.
@@ -360,9 +365,7 @@ func (t *Target) pageEvent(ev interface{}) {
 
 // domEvent handles incoming DOM events.
 func (t *Target) domEvent(ctx context.Context, ev interface{}) {
-	t.frameMu.RLock()
-	f := t.frames[t.cur]
-	t.frameMu.RUnlock()
+	f := t.GetCurrentFrame()
 
 	var id cdp.NodeID
 	var op nodeOp
