@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff  # v5
         with:
           go-version: ${{ matrix.go-version }}
       - name: Install Packages
@@ -16,7 +16,7 @@ jobs:
           sudo apt-get -qq update
           sudo apt-get install -y build-essential
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
       - name: Test Chrome
         run: go test -v ./...
       - name: Test headless-shell
